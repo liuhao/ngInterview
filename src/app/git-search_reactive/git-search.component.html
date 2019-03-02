@@ -1,0 +1,27 @@
+<h3>{{title}} - {{displayQuery}}</h3>
+<form (ngSubmit)="sendQuery()" [formGroup]="form">
+  <div *ngFor="let key of modelKeys">
+    {{key}} <input formControlName="{{key}}" placeholder="Enter {{key}} Here" />
+  </div>
+  <button type="submit" [disabled]="!form.valid">Submit</button>
+</form>
+<div *ngIf="searchResults; else elseBlock">
+  <h3 class="total">Total Results: {{searchResults.total_count}}</h3>
+  <ul class="list">
+    <li [ngClass]="{'item_even' : i%2 === 0, 'list_item' : true}" *ngFor="let result of searchResults.items; index as i;">
+      <a [href]="result.html_url">
+        <img class="avatar" [src]="result.owner.avatar_url" />
+        <h4 class="title">{{result.name}}
+          <small> by {{result.owner.login | uppercase}}</small>
+        </h4>
+      </a>
+      <p class="description"> {{result.description}}</p>
+      <p> Created On: {{result.created_at | date:'fullDate'}}</p>
+    </li>
+  </ul>
+</div>
+<ng-template #elseBlock>Loading...</ng-template>
+<p>
+  <button (click)="previousPage()">Previous</button>
+  <button (click)="nextPage()">Next</button>
+</p>
