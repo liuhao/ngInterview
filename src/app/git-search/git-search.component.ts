@@ -3,10 +3,8 @@ import { UnifiedSearchService } from '../unified-search.service';
 import { ActivatedRoute, ParamMap, Router } from '@angular/router';
 import { AdvancedSearchModel } from '../advanced-search-model';
 import {UnifiedSearch} from '../unified-search';
-import {GitSearch} from '../git-search';
 import {GitSearchService} from '../git-search.service';
 import {GitCodeSearchService} from '../git-code-search.service';
-import {GitCodeSearch} from '../git-code-search';
 
 @Component({
   selector: 'app-git-search',
@@ -14,12 +12,12 @@ import {GitCodeSearch} from '../git-code-search';
   styleUrls: ['./git-search.component.css']
 })
 export class GitSearchComponent implements OnInit {
-  searchResults: GitSearch;
-  codeSearchResults: GitCodeSearch;
+  searchResults: UnifiedSearch;
   searchQuery: string;
   title: string;
   displayQuery: string;
   page: number;
+  favorites: Array<number> = [];
 
   constructor(private unifiedSearchService: UnifiedSearchService,
               private gitSearchService: GitSearchService, private gitCodeSearchService: GitCodeSearchService,
@@ -41,25 +39,10 @@ export class GitSearchComponent implements OnInit {
     });
   }
 
-  gitSearchOld = (query: string) => {
-    this.gitCodeSearchService.codeSearch(this.searchQuery).subscribe( (response1) => {
-      this.codeSearchResults = response1;
-      console.log(response1);
-    }, (error) => {
-      alert('Error: ' + error.statusText);
-    });
-    this.gitSearchService.gitSearch(this.searchQuery).subscribe( (response) => {
-      this.searchResults = response;
-    }, (error) => {
-      alert('Error: ' + error.statusText);
-    });
-
-  }
-
   gitSearch = (query: string) => {
     this.unifiedSearchService.unifiedSearch(query).subscribe((response) => {
       console.log(response);
-      this.searchResults = response.repositories;
+      this.searchResults = response;
     }, (error) => {
       alert('Error: ' + error.statusText);
     });
@@ -84,6 +67,15 @@ export class GitSearchComponent implements OnInit {
     this.displayQuery = this.searchQuery;
     this.gitSearch(this.searchQuery);
   }
+
+  handleFavorite = (id) => {
+    let i = this.favorites.indexOf(id);
+    if (i > -1) {
+      return this.favorites.splice(i, 1);
+    } else {
+      return this.favorites.push(id);
+    }
+  };
 
   nextPage = () => {
     this.page += 1;
